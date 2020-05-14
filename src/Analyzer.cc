@@ -1695,6 +1695,10 @@ void Analyzer::applyJetEnergyCorrections(Particle& jet, const CUTS eGenPos, cons
       }
     }
 
+
+    std::cout << "Muon idx 1 = " << _Jet->matchingMuonIdx1[i] << " muon idx 2 = " << _Jet->matchingMuonIdx2[i] << std::endl;
+    if(_Jet->matchingMuonIdx1[i] > -1) std::cout << "Muon 1 pt = " << _Muon->pt(_Jet->matchingMuonIdx1[i]) << ", eta = " << _Muon->eta(_Jet->matchingMuonIdx1[i]) << ", phi = " << _Muon->phi(_Jet->matchingMuonIdx1[i]) << ", mass = " << _Muon->mass(_Jet->matchingMuonIdx1[i]) << ", is Global? " << _Muon->isGlobal[_Jet->matchingMuonIdx1[i]] << std::endl;
+    if(_Jet->matchingMuonIdx2[i] > -1) std::cout << "Muon 2 pt = " << _Muon->pt(_Jet->matchingMuonIdx2[i]) << ", eta = " << _Muon->eta(_Jet->matchingMuonIdx2[i]) << ", phi = " << _Muon->phi(_Jet->matchingMuonIdx2[i]) << ", mass = " << _Muon->mass(_Jet->matchingMuonIdx2[i]) << ", is Global? " << _Muon->isGlobal[_Jet->matchingMuonIdx1[i]] << std::endl;
     // Set the jet pt to the muon substracted raw pt
     jet_Pt = newjetP4.Pt();
     jet_RawFactor = 0.0;
