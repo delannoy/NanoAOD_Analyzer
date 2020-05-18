@@ -289,6 +289,11 @@ public:
 
   Float_t jec_rho =20.;
 
+  float def_met = 0.0;
+  float t1_met = 0.0;
+  float raw_met = 0.0;
+  float updatedraw_met = 0.0;
+
   const static std::vector<CUTS> genCuts;
   const static std::vector<CUTS> jetCuts;
   const static std::vector<CUTS> nonParticleCuts;

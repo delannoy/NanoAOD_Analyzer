@@ -17,7 +17,7 @@ Met::Met(TTree* _BOOM, std::string _GenName,  std::vector<std::string> _syst_nam
   // Then we get the default met
   if(GenName.compare("MET") != 0){
     samedeft1met = false;
-    std::cout << "Not here! " << std::endl;
+    // std::cout << "Not here! " << std::endl;
     SetBranch("MET_pt", def_met_pt);
     SetBranch("MET_phi", def_met_phi);
   }
@@ -122,8 +122,10 @@ void Met::init(){
 
 
 void Met::update(PartStats& stats, Jet& jet, int syst=0){
-  ///Calculates met from values from each file plus smearing and treating muons as neutrinos
+
   if(systVec.at(syst) == nullptr) return;
+
+  ///Calculates met from values from each file plus smearing and treating muons as neutrinos
   double sumpxForMht=0;
   double sumpyForMht=0;
   double sumptForHt=0;
@@ -161,7 +163,7 @@ void Met::propagateJetEnergyCorr(TLorentzVector recoJet, double const& jet_pt_up
   double jet_cosPhi = cos(recoJet.Phi());
   double jet_sinPhi = sin(recoJet.Phi());
 
-  std::cout << "Before: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl;
+  //std::cout << "Before: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl;
   // Update the nominal values:
   met_px_shifted = systRawMetVec.at(syst)->Px();
   met_py_shifted = systRawMetVec.at(syst)->Py();
@@ -179,7 +181,7 @@ void Met::propagateJetEnergyCorr(TLorentzVector recoJet, double const& jet_pt_up
   // Change the Raw Met vector:
   systRawMetVec.at(syst)->SetPxPyPzE(met_px_shifted, met_py_shifted, systRawMetVec.at(syst)->Pz(), TMath::Sqrt(pow(met_px_shifted,2) + pow(met_py_shifted,2)));
 
-  std::cout << "After: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl; 
+  //std::cout << "After: RawMet.px() (=- (jet_pt_L1L2L3 - jet_pt_L1)*jet_cosPhi) = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() (=- (jet_pt_L1L2L3 - jet_pt_L1)*jet_sinPhi) = " << systRawMetVec.at(syst)->Py() << std::endl; 
 
   // Add this to the systematics vector
   // systVec.at(syst)->SetPxPyPzE(met_px_shifted, met_py_shifted, systVec.at(syst)->Pz(), TMath::Sqrt(pow(met_px_shifted,2) + pow(met_py_shifted,2)));
@@ -191,35 +193,41 @@ void Met::propagateUnclEnergyUnctyEE(double const& delta_x_T1Jet, double const& 
 
   if(systRawMetVec.at(syst) == nullptr) return;
 
-  std::cout << "Before EE: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl;
-  std::cout << "def_met_px (b) = " << DefMet.Px() << ", def_met_py (b) = " << DefMet.Py() << std::endl;
-  std::cout << "t1_met_px (b) = " << T1Met.Px() << ", t1_met_py (b) = " << T1Met.Py() << std::endl;
+  //std::cout << std::endl <<  "Before EE: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl;
+  //std::cout << "def_met_px (b) = " << DefMet.Px() << ", def_met_py (b) = " << DefMet.Py() << std::endl;
+  //std::cout << "t1_met_px (b) = " << T1Met.Px() << ", t1_met_py (b) = " << T1Met.Py() << std::endl;
 
   // Remove the L1L2L3 - L1 corrected jets in the EE region from the default MET branch
   double new_def_met_px = DefMet.Px() + delta_x_T1Jet;
   double new_def_met_py = DefMet.Py() + delta_y_T1Jet;
 
-  std::cout << "new_def_met_px = " << new_def_met_px << ", new_def_met_py = " << new_def_met_py << std::endl;
+  //std::cout << "new_def_met_px (=+ delta_x_T1Jet) = " << new_def_met_px << ", new_def_met_py (=+ delta_y_T1Jet) = " << new_def_met_py << std::endl;
 
   DefMet.SetPxPyPzE(new_def_met_px, new_def_met_py, DefMet.Pz(), sqrt(pow(new_def_met_px,2) + pow(new_def_met_py, 2)));
 
-  std::cout << "def_met_px (a) = " << DefMet.Px() << ", def_met_py (a) = " << DefMet.Py() << std::endl;
+  //std::cout << "def_met_px (a) = " << DefMet.Px() << ", def_met_py (a) = " << DefMet.Py() << std::endl;
 
   // Get the unclustered energy part that is removed in the v2 recipe
-  double met_unclEE_x = DefMet.Px() - t1met_px;
-  double met_unclEE_y = DefMet.Py() - t1met_py;
+  double met_unclEE_x = DefMet.Px() - T1Met.Px(); //t1met_px;
+  double met_unclEE_y = DefMet.Py() - T1Met.Py(); //t1met_py;
+
+  //std::cout << "met_unclEE_x (=def_met_px - t1met_px) = " <<  met_unclEE_x << ", met_unclEE_y (=def_met_py - t1met_py) = " <<  met_unclEE_y << std::endl;
 
   // Finalize the v2 recipe for the rawMET by removing the unclustered part in the EE region
   double met_px_unclshift = systRawMetVec.at(syst)->Px();
   double met_py_unclshift = systRawMetVec.at(syst)->Py();
 
+  //std::cout << "met_px_unclshift (RawMetVec) = " << met_px_unclshift << ", met_py_unclshift (RawMetVec) = " << met_py_unclshift << std::endl;
+
   met_px_unclshift = met_px_unclshift + delta_x_rawJet - met_unclEE_x;
   met_py_unclshift = met_py_unclshift + delta_y_rawJet - met_unclEE_y;
 
-  std::cout << "After EE: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl; 
+  //std::cout << "met_px_unclshift (met_px_unclshift +delta_x_rawJet - met_unclEE_x) = " << met_px_unclshift << ", met_py_unclshift (met_py_unclshift +delta_y_rawJet - met_unclEE_y) = " << met_py_unclshift << std::endl;
 
   // Add this to the systematics vector
   systRawMetVec.at(syst)->SetPxPyPzE(met_px_unclshift, met_py_unclshift, systRawMetVec.at(syst)->Pz(), TMath::Sqrt(pow(met_px_unclshift,2) + pow(met_py_unclshift,2)));
+
+  //std::cout << std::endl << "After EE: RawMet.px() = " << systRawMetVec.at(syst)->Px() << ", RawMet.py() = " << systRawMetVec.at(syst)->Py() << std::endl; 
 
 }
 
@@ -274,6 +282,17 @@ void Met::setMT2Mass(double mass){
 }
 
 void Met::setCurrentP(int syst){
+  // Use the information from the raw met vector instead, since this is the vector all jet corrections
+  // are propagated to.
+  if(systRawMetVec.at(syst) == nullptr) {
+    cur_P = systRawMetVec.at(0);
+    activeSystematic = 0;
+  } else {
+    cur_P = systRawMetVec[syst];
+    activeSystematic=syst;
+  }
+
+/*
   if( systVec.at(syst) == nullptr) {
     cur_P = systVec.at(0);
     activeSystematic = 0;
@@ -281,6 +300,7 @@ void Met::setCurrentP(int syst){
     cur_P = systVec[syst];
     activeSystematic=syst;
   }
+*/
 }
 
 
